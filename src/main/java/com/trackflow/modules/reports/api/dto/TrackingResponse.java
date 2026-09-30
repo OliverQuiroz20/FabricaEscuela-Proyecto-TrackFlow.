@@ -5,8 +5,8 @@ import java.time.Instant;
 public record TrackingResponse(
         String trackingNumber,
         String status,
-        String remitenteNombre,
-        String ciudadOrigen,
+        String senderName,
+        String originCity,
         String recipientName,
         Long destinationCityId,
         String destinationCity,

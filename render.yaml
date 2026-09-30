@@ -34,3 +34,6 @@ services:
       # Render genera el secreto de firma; si se regenera, los tokens vigentes caducan.
       - key: TRACKFLOW_JWT_SECRET
         generateValue: true
+      # Dominio(s) del frontend, separados por comas. Sin él solo se admite localhost.
+      - key: TRACKFLOW_CORS_ORIGINS
+        sync: false

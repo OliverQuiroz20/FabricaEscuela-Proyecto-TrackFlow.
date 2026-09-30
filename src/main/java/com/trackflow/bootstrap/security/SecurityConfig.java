@@ -38,6 +38,9 @@ public class SecurityConfig {
                 // Sin esto, el filtro de seguridad rechaza las peticiones preflight antes de
                 // que se aplique la configuración CORS de Spring MVC (ver CorsConfig).
                 .cors(Customizer.withDefaults())
+                // CSRF explota que el navegador adjunta solo las cookies de sesión. Aquí no
+                // hay cookies: la sesión es STATELESS y el JWT viaja en la cabecera
+                // Authorization, que un sitio ajeno no puede añadir. Por eso se desactiva.
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> {
