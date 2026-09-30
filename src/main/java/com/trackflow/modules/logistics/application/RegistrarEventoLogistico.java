@@ -47,15 +47,14 @@ public class RegistrarEventoLogistico {
 
         Instant now = clock.instant();
         LogisticsEvent saved = logisticsEvents.save(LogisticsEvent.registrar(
-                entrante.eventId(),
-                entrante.trackingNumber(),
-                entrante.tipo(),
-                entrante.punto(),
-                entrante.observaciones(),
-                entrante.centroId(),
-                entrante.ciudadNombre(),
-                entrante.repartidorNombre(),
-                entrante.ocurridoEn(),
+                new LogisticsEvent.Reporte(
+                        entrante.eventId(),
+                        entrante.trackingNumber(),
+                        entrante.tipo(),
+                        new LogisticsEvent.Lugar(entrante.punto(), entrante.centroId(), entrante.ciudadNombre()),
+                        entrante.observaciones(),
+                        entrante.repartidorNombre(),
+                        entrante.ocurridoEn()),
                 now));
 
         events.publish(new EventoLogisticoRegistradoEvent(

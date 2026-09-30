@@ -56,7 +56,7 @@ public class SecurityProperties {
 
     /**
      * Roles que corresponden a unas credenciales, o {@code null} si no son válidas.
-     * El administrador también es operador: puede hacer todo lo que hace este.
+     * El administrador también es operador: hereda sus permisos.
      */
     public String rolesDe(String usuario, String clave) {
         if (!esVacia(adminClave) && coincide(adminUsuario, usuario) && coincide(adminClave, clave)) {

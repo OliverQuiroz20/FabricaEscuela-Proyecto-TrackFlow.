@@ -54,21 +54,28 @@ public class ShipmentTrackingView {
     @Column
     private Instant lastMovementAt;
 
+    /** Quién envía y desde qué ciudad. */
+    public record Origen(String senderName, Long cityId, String city) {
+    }
+
+    /** Quién recibe, dónde y en qué ciudad. */
+    public record Destino(String recipientName, String recipientAddress, Long cityId, String city) {
+    }
+
     protected ShipmentTrackingView() {
     }
 
-    public ShipmentTrackingView(String trackingNumber, String status, String senderName, Long originCityId,
-                                String originCity, String recipientName, String recipientAddress,
-                                Long destinationCityId, String destinationCity, Instant registeredAt) {
+    public ShipmentTrackingView(String trackingNumber, String status, Origen origen, Destino destino,
+                                Instant registeredAt) {
         this.trackingNumber = trackingNumber;
         this.status = status;
-        this.senderName = senderName;
-        this.originCityId = originCityId;
-        this.originCity = originCity;
-        this.recipientName = recipientName;
-        this.recipientAddress = recipientAddress;
-        this.destinationCityId = destinationCityId;
-        this.destinationCity = destinationCity;
+        this.senderName = origen.senderName();
+        this.originCityId = origen.cityId();
+        this.originCity = origen.city();
+        this.recipientName = destino.recipientName();
+        this.recipientAddress = destino.recipientAddress();
+        this.destinationCityId = destino.cityId();
+        this.destinationCity = destino.city();
         this.registeredAt = registeredAt;
     }
 
