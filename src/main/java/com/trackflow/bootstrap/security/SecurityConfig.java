@@ -52,6 +52,10 @@ public class SecurityConfig {
                     // petición real —GET, POST— sigue evaluándose por las reglas de abajo.
                     auth.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll();
                     auth.requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll();
+                    // Consultar o cerrar la propia sesión solo exige un token válido, sea
+                    // cual sea el rol.
+                    auth.requestMatchers(HttpMethod.GET, "/api/auth/sesion").authenticated();
+                    auth.requestMatchers(HttpMethod.POST, "/api/auth/logout").authenticated();
                     auth.requestMatchers(HttpMethod.GET, "/api/tracking/**").permitAll();
                     auth.requestMatchers(HttpMethod.GET, "/api/shipments/*/events").permitAll();
                     auth.requestMatchers("/", "/actuator/health/**", "/swagger-ui.html",

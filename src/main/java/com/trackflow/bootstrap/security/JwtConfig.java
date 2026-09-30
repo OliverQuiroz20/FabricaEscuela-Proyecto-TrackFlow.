@@ -6,7 +6,9 @@ import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.oauth2.core.DelegatingOAuth2TokenValidator;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.jwt.JwtValidators;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
@@ -33,8 +35,15 @@ public class JwtConfig {
         return new NimbusJwtEncoder(new ImmutableSecret<>(clave));
     }
 
+    /**
+     * A las validaciones por defecto (vencimiento) se suma la de sesión cerrada (HU-08):
+     * sin ella, un token seguiría sirviendo después del logout hasta que venciera.
+     */
     @Bean
-    JwtDecoder jwtDecoder() {
-        return NimbusJwtDecoder.withSecretKey(clave).build();
+    JwtDecoder jwtDecoder(TokenRevocadoRepository revocados) {
+        NimbusJwtDecoder decoder = NimbusJwtDecoder.withSecretKey(clave).build();
+        decoder.setJwtValidator(new DelegatingOAuth2TokenValidator<>(
+                JwtValidators.createDefault(), new TokenNoRevocadoValidator(revocados)));
+        return decoder;
     }
 }
