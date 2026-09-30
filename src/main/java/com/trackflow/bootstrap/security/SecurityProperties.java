@@ -22,6 +22,9 @@ public class SecurityProperties {
 
     private static final Logger log = LoggerFactory.getLogger(SecurityProperties.class);
 
+    /** Se reutiliza: crear un SecureRandom por llamada es costoso y no mejora la aleatoriedad. */
+    private static final SecureRandom ALEATORIO = new SecureRandom();
+
     public static final String ROL_OPERADOR = "OPERADOR";
     public static final String ROL_ADMIN = "ADMIN";
 
@@ -81,7 +84,7 @@ public class SecurityProperties {
         }
 
         byte[] aleatorio = new byte[32];
-        new SecureRandom().nextBytes(aleatorio);
+        ALEATORIO.nextBytes(aleatorio);
         return Base64.getEncoder().encodeToString(aleatorio);
     }
 

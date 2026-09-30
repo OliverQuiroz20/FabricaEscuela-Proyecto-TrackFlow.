@@ -64,10 +64,10 @@ public class ConsultarAccionesDisponibles {
         CiudadEsperada esperada = FlujoLogistico.ciudadEsperada(tipo, estado.ultimoTipo());
         Ciudad ciudad = estado.ciudadQueExige(esperada);
 
-        return new Accion(tipo, esperada, ciudad, centrosPara(esperada, ciudad, estado), rutaPara(tipo, estado));
+        return new Accion(tipo, esperada, ciudad, centrosPara(ciudad, estado), rutaPara(tipo, estado));
     }
 
-    private List<CentroDisponible> centrosPara(CiudadEsperada esperada, Ciudad ciudad, EstadoDelEnvio estado) {
+    private List<CentroDisponible> centrosPara(Ciudad ciudad, EstadoDelEnvio estado) {
         // Con ciudad concreta basta con filtrar por ella; en el paso por un hub la
         // regla es al revés — sirve cualquiera menos la de destino, porque un centro
         // de la ciudad de destino significa que el paquete ya llegó.
