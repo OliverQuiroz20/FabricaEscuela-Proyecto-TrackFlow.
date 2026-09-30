@@ -36,7 +36,7 @@ public class AuthController {
     public record TokenResponse(String token, String tipo, String roles, long expiraEnSegundos) {
     }
 
-    public record SesionResponse(String usuario, String roles, Instant expiraEn) {
+    public record SesionResponse(String username, String roles, Instant expiresAt) {
     }
 
     private final SecurityProperties propiedades;
