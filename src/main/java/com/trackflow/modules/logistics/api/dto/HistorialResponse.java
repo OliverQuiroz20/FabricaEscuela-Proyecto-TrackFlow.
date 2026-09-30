@@ -8,12 +8,13 @@ import java.util.List;
  *
  * El mensaje distingue un envío que existe pero aún no se ha movido de una lista
  * vacía sin explicación; el número inexistente no llega aquí, responde 404.
+ * Los campos van en inglés, igual que TrackingResponse (bug #89).
  */
 public record HistorialResponse(
         String trackingNumber,
-        int totalMovimientos,
-        String mensaje,
-        List<EventoLogisticoResponse> movimientos) {
+        int totalMovements,
+        String message,
+        List<EventoLogisticoResponse> movements) {
 
     static final String SIN_MOVIMIENTOS = "El envío todavía no registra movimientos";
 
