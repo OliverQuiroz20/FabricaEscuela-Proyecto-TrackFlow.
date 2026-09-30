@@ -2,14 +2,13 @@ package com.trackflow.modules.logistics.api;
 
 import com.trackflow.modules.logistics.api.dto.AccionesDisponiblesResponse;
 import com.trackflow.modules.logistics.api.dto.EventoAdmitidoResponse;
-import com.trackflow.modules.logistics.api.dto.EventoLogisticoResponse;
+import com.trackflow.modules.logistics.api.dto.HistorialResponse;
 import com.trackflow.modules.logistics.api.dto.RegistrarEventoRequest;
 import com.trackflow.modules.logistics.application.AdmitirEventoLogistico;
 import com.trackflow.modules.logistics.application.ConsultarAccionesDisponibles;
 import com.trackflow.modules.logistics.application.ConsultarHistorial;
 import com.trackflow.modules.logistics.application.EventoLogisticoEntrante;
 import jakarta.validation.Valid;
-import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -52,11 +51,13 @@ public class LogisticsEventController {
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(EventoAdmitidoResponse.from(evento));
     }
 
+    /**
+     * Historial del envío (HU-04). Público, como la consulta de estado: el número de
+     * seguimiento es la credencial del cliente.
+     */
     @GetMapping("/events")
-    public List<EventoLogisticoResponse> historial(@PathVariable String trackingNumber) {
-        return consultarHistorial.ejecutar(trackingNumber).stream()
-                .map(EventoLogisticoResponse::from)
-                .toList();
+    public HistorialResponse historial(@PathVariable String trackingNumber) {
+        return HistorialResponse.from(trackingNumber, consultarHistorial.ejecutar(trackingNumber));
     }
 
     /**
