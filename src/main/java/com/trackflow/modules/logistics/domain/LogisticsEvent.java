@@ -59,20 +59,33 @@ public class LogisticsEvent {
     @Column(nullable = false, updatable = false)
     private Instant registeredAt;
 
+    /**
+     * Dónde ocurrió el movimiento.
+     *
+     * @param centerId id del centro del catálogo, o null si se reportó con texto libre
+     * @param cityName ciudad del centro, congelada en el momento del registro
+     */
+    public record Lugar(String point, Long centerId, String cityName) {
+    }
+
+    /** Lo que reporta el operador, antes de que el sistema le ponga fecha de registro. */
+    public record Reporte(String eventId, String trackingNumber, EventType type, Lugar lugar, String notes,
+            String delivererName, Instant occurredAt) {
+    }
+
     protected LogisticsEvent() {
     }
 
-    private LogisticsEvent(String eventId, String trackingNumber, EventType type, String point, String notes,
-            Long centerId, String cityName, String delivererName, Instant occurredAt, Instant registeredAt) {
-        this.eventId = eventId;
-        this.trackingNumber = trackingNumber;
-        this.type = type;
-        this.point = point;
-        this.notes = notes;
-        this.centerId = centerId;
-        this.cityName = cityName;
-        this.delivererName = delivererName;
-        this.occurredAt = occurredAt;
+    private LogisticsEvent(Reporte reporte, Instant registeredAt) {
+        this.eventId = reporte.eventId();
+        this.trackingNumber = reporte.trackingNumber();
+        this.type = reporte.type();
+        this.point = reporte.lugar().point();
+        this.notes = reporte.notes();
+        this.centerId = reporte.lugar().centerId();
+        this.cityName = reporte.lugar().cityName();
+        this.delivererName = reporte.delivererName();
+        this.occurredAt = reporte.occurredAt();
         this.registeredAt = registeredAt;
     }
 
@@ -80,15 +93,13 @@ public class LogisticsEvent {
      * Un movimiento no puede haber ocurrido después de reportarse. Se comprueba aquí
      * y no en el DTO porque el reporte llega por REST y también por la cola.
      */
-    public static LogisticsEvent registrar(String eventId, String trackingNumber, EventType type, String point,
-            String notes, Long centerId, String cityName, String delivererName, Instant occurredAt,
-            Instant registeredAt) {
+    public static LogisticsEvent registrar(Reporte reporte, Instant registeredAt) {
+        Instant occurredAt = reporte.occurredAt();
         if (occurredAt == null || occurredAt.isAfter(registeredAt)) {
             throw new FechaDeMovimientoInvalidaException(occurredAt, registeredAt);
         }
 
-        return new LogisticsEvent(eventId, trackingNumber, type, point, notes, centerId, cityName, delivererName,
-                occurredAt, registeredAt);
+        return new LogisticsEvent(reporte, registeredAt);
     }
 
     public Long getId() {

@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
@@ -31,7 +32,7 @@ public class SecurityConfig {
     }
 
     @Bean
-    SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    SecurityFilterChain filterChain(HttpSecurity http) {
         boolean protegido = propiedades.proteccionActiva();
 
         http
@@ -41,7 +42,7 @@ public class SecurityConfig {
                 // CSRF explota que el navegador adjunta solo las cookies de sesión. Aquí no
                 // hay cookies: la sesión es STATELESS y el JWT viaja en la cabecera
                 // Authorization, que un sitio ajeno no puede añadir. Por eso se desactiva.
-                .csrf(csrf -> csrf.disable())
+                .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> {
                     // El OPTIONS de precomprobación nunca lleva token, por diseño del propio
