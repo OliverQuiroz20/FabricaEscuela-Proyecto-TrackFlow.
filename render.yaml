@@ -1,9 +1,9 @@
 services:
   - type: web
-    name: trackflow
+    name: trackflow-equipo
     runtime: docker
     plan: free
-    region: oregon
+    region: virginia
     healthCheckPath: /actuator/health
     envVars:
       # Todos estos valores se definen en el dashboard de Render, nunca en este archivo.
@@ -37,3 +37,8 @@ services:
       # Dominio(s) del frontend, separados por comas. Sin él solo se admite localhost.
       - key: TRACKFLOW_CORS_ORIGINS
         sync: false
+      # Carga los envíos semilla del plan de calidad (sección 6.5): TF000000000001 sin
+      # movimientos, TF000000000002 en tránsito y TF000000000003 entregado. Los casos
+      # CP-01 a CP-10 se ejecutan contra ellos. Solo se crean si aún no existen.
+      - key: TRACKFLOW_SEED_ENABLED
+        value: "true"
