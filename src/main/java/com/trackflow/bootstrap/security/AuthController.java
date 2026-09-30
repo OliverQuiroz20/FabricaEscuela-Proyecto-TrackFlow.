@@ -24,11 +24,11 @@ import org.springframework.web.server.ResponseStatusException;
 public class AuthController {
 
     public record LoginRequest(
-            @NotBlank(message = "el usuario es obligatorio") String usuario,
-            @NotBlank(message = "la clave es obligatoria") String clave) {
+            @NotBlank(message = "el usuario es obligatorio") String username,
+            @NotBlank(message = "la clave es obligatoria") String password) {
     }
 
-    public record TokenResponse(String token, String tipo, String roles, long expiraEnSegundos) {
+    public record TokenResponse(String token, String type, String roles, long expiresInSeconds) {
     }
 
     private final SecurityProperties propiedades;
@@ -47,7 +47,7 @@ public class AuthController {
                     "No hay credenciales configuradas en este entorno");
         }
 
-        String roles = propiedades.rolesDe(request.usuario(), request.clave());
+        String roles = propiedades.rolesDe(request.username(), request.password());
         if (roles == null) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Usuario o clave incorrectos");
         }
@@ -59,7 +59,7 @@ public class AuthController {
                 .issuer("trackflow")
                 .issuedAt(ahora)
                 .expiresAt(expiracion)
-                .subject(request.usuario())
+                .subject(request.username())
                 .claim("roles", roles)
                 .build();
 

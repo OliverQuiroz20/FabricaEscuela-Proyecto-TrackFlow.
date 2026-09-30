@@ -43,11 +43,11 @@ public class LogisticsEventController {
             @Valid @RequestBody RegistrarEventoRequest request) {
         EventoLogisticoEntrante evento = admitirEventoLogistico.ejecutar(new AdmitirEventoLogistico.Command(
                 trackingNumber,
-                request.tipo(),
-                request.centroId(),
-                request.observaciones(),
-                request.repartidorNombre(),
-                request.ocurridoEn()));
+                request.type(),
+                request.centerId(),
+                request.notes(),
+                request.delivererName(),
+                request.occurredAt()));
 
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(EventoAdmitidoResponse.from(evento));
     }
@@ -63,7 +63,7 @@ public class LogisticsEventController {
      * Qué movimientos admite el envío ahora y con qué centros, para que el operador
      * escoja de una lista corta y correcta en vez del catálogo entero.
      */
-    @GetMapping("/acciones")
+    @GetMapping("/actions")
     public AccionesDisponiblesResponse acciones(@PathVariable String trackingNumber) {
         return AccionesDisponiblesResponse.from(consultarAccionesDisponibles.ejecutar(trackingNumber));
     }

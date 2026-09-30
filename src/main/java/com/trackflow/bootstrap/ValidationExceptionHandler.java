@@ -34,7 +34,7 @@ public class ValidationExceptionHandler {
         ProblemDetail problema = ProblemDetail.forStatus(HttpStatus.BAD_REQUEST);
         problema.setTitle("Datos obligatorios incompletos");
         problema.setDetail("La solicitud no se puede procesar porque faltan datos obligatorios");
-        problema.setProperty("camposFaltantes", campos);
+        problema.setProperty("missingFields", campos);
 
         return problema;
     }
@@ -51,7 +51,7 @@ public class ValidationExceptionHandler {
         ProblemDetail problema = ProblemDetail.forStatus(HttpStatus.BAD_REQUEST);
         problema.setTitle("Valor no admitido");
         problema.setDetail("Alguno de los campos trae un valor que no se puede interpretar");
-        problema.setProperty("causa", causa);
+        problema.setProperty("cause", causa);
 
         return problema;
     }

@@ -13,7 +13,7 @@ public class CentroInvalidoException extends RuntimeException {
 
     public static CentroInvalidoException noExiste(Long centroId) {
         return new CentroInvalidoException(
-                "El centro %d no existe. Consulte GET /api/centros?q= para ver los centros disponibles"
+                "El centro %d no existe. Consulte GET /api/centers?q= para ver los centros disponibles"
                         .formatted(centroId));
     }
 

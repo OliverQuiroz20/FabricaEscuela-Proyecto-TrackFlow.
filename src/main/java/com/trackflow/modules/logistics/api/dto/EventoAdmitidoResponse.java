@@ -6,11 +6,11 @@ import java.time.Instant;
 public record EventoAdmitidoResponse(
         String eventId,
         String trackingNumber,
-        String tipo,
-        Long centroId,
-        String punto,
-        Instant ocurridoEn,
-        String estadoProcesamiento) {
+        String type,
+        Long centerId,
+        String point,
+        Instant occurredAt,
+        String processingStatus) {
 
     public static EventoAdmitidoResponse from(EventoLogisticoEntrante evento) {
         return new EventoAdmitidoResponse(
@@ -20,6 +20,6 @@ public record EventoAdmitidoResponse(
                 evento.centroId(),
                 evento.punto(),
                 evento.ocurridoEn(),
-                "ENCOLADO");
+                "QUEUED");
     }
 }

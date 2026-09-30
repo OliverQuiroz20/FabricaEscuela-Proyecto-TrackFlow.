@@ -11,13 +11,13 @@ import java.time.Instant;
 public record EventoLogisticoMensaje(
         String eventId,
         String trackingNumber,
-        String tipo,
-        Long centroId,
-        String punto,
-        String ciudadNombre,
-        String observaciones,
-        String repartidorNombre,
-        Instant ocurridoEn) {
+        String type,
+        Long centerId,
+        String point,
+        String cityName,
+        String notes,
+        String delivererName,
+        Instant occurredAt) {
 
     public static EventoLogisticoMensaje from(EventoLogisticoEntrante evento) {
         return new EventoLogisticoMensaje(
@@ -36,12 +36,12 @@ public record EventoLogisticoMensaje(
         return new EventoLogisticoEntrante(
                 eventId,
                 trackingNumber,
-                EventType.valueOf(tipo),
-                centroId,
-                punto,
-                ciudadNombre,
-                observaciones,
-                repartidorNombre,
-                ocurridoEn);
+                EventType.valueOf(type),
+                centerId,
+                point,
+                cityName,
+                notes,
+                delivererName,
+                occurredAt);
     }
 }

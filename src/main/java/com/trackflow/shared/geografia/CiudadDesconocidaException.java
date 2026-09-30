@@ -9,7 +9,7 @@ public class CiudadDesconocidaException extends RuntimeException {
 
     public CiudadDesconocidaException(Long id) {
         super(("La ciudad %s no está en el catálogo. "
-                + "Consulte GET /api/ciudades?q= para obtener los identificadores válidos")
+                + "Consulte GET /api/cities?q= para obtener los identificadores válidos")
                 .formatted(id));
         this.id = id;
     }

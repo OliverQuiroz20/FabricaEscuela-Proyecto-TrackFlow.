@@ -15,9 +15,9 @@ public class SolicitudesDescartadasListener {
 
     @RabbitListener(queues = ShipmentsRabbitMQConfig.DEAD_LETTER_QUEUE)
     public void recibir(EnvioSolicitadoMensaje mensaje) {
-        log.error("Solicitud de envío descartada: eventId={} trackingNumber={} destinatario={} solicitadoEn={}",
+        log.error("Solicitud de envío descartada: eventId={} trackingNumber={} recipient={} requestedAt={}",
                 mensaje.eventId(), mensaje.trackingNumber(),
-                mensaje.destinatario() != null ? mensaje.destinatario().nombreCompleto() : null,
-                mensaje.solicitadoEn());
+                mensaje.recipient() != null ? mensaje.recipient().fullName() : null,
+                mensaje.requestedAt());
     }
 }

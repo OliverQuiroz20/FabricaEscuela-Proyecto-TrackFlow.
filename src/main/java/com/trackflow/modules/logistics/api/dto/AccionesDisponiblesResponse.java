@@ -3,6 +3,7 @@ package com.trackflow.modules.logistics.api.dto;
 import com.trackflow.modules.logistics.application.ConsultarAccionesDisponibles.Accion;
 import com.trackflow.modules.logistics.application.ConsultarAccionesDisponibles.Acciones;
 import com.trackflow.modules.logistics.application.EstadoDelEnvio;
+import com.trackflow.modules.logistics.domain.CiudadEsperada;
 import com.trackflow.shared.geografia.Ciudad;
 import java.time.Instant;
 import java.util.List;
@@ -14,15 +15,15 @@ import java.util.List;
  */
 public record AccionesDisponiblesResponse(
         String trackingNumber,
-        String estadoActual,
-        String ultimoMovimiento,
-        Instant ultimoMovimientoEn,
-        UbicacionResponse ubicacionActual,
-        CiudadResponse origen,
-        CiudadResponse destino,
-        List<AccionResponse> acciones) {
+        String currentStatus,
+        String lastMovement,
+        Instant lastMovementAt,
+        UbicacionResponse currentLocation,
+        CiudadResponse origin,
+        CiudadResponse destination,
+        List<AccionResponse> actions) {
 
-    public record CiudadResponse(Long id, String nombre) {
+    public record CiudadResponse(Long id, String name) {
 
         static CiudadResponse from(Ciudad ciudad) {
             return ciudad == null ? null : new CiudadResponse(ciudad.id(), ciudad.etiqueta());
@@ -30,7 +31,7 @@ public record AccionesDisponiblesResponse(
     }
 
     /** Dónde está el paquete. El centro es null si todavía no ha pasado por ninguno. */
-    public record UbicacionResponse(Long centroId, String centroNombre, Long ciudadId, String ciudadNombre) {
+    public record UbicacionResponse(Long centerId, String centerName, Long cityId, String cityName) {
     }
 
     /**
@@ -39,13 +40,13 @@ public record AccionesDisponiblesResponse(
      * @param ruta trayecto del movimiento; solo el despacho tiene, el resto es null
      */
     public record AccionResponse(
-            String tipo,
-            String etiqueta,
-            String estadoResultante,
-            String ciudadEsperada,
-            CiudadResponse ciudadDeLosCentros,
-            List<CentroResponse> centros,
-            String ruta) {
+            String type,
+            String label,
+            String resultingStatus,
+            String expectedCity,
+            CiudadResponse centersCity,
+            List<CentroResponse> centers,
+            String route) {
     }
 
     public static AccionesDisponiblesResponse from(Acciones acciones) {
@@ -71,11 +72,21 @@ public record AccionesDisponiblesResponse(
                 accion.tipo().name(),
                 accion.tipo().etiqueta(),
                 accion.tipo().resultingStatus(),
-                accion.ciudadEsperada().name(),
+                ciudadEsperadaEnIngles(accion.ciudadEsperada()),
                 CiudadResponse.from(accion.ciudadDeLosCentros()),
                 accion.centros().stream()
                         .map(disponible -> CentroResponse.from(disponible.centro(), disponible.ciudad()))
                         .toList(),
                 accion.ruta());
+    }
+
+    /** El enum del dominio va en español; el contrato de la API, en inglés. */
+    private static String ciudadEsperadaEnIngles(CiudadEsperada ciudad) {
+        return switch (ciudad) {
+            case ORIGEN -> "ORIGIN";
+            case DESTINO -> "DESTINATION";
+            case ACTUAL -> "CURRENT";
+            case HUB_INTERMEDIO -> "INTERMEDIATE_HUB";
+        };
     }
 }

@@ -6,10 +6,10 @@ import java.time.Instant;
 public record EnvioAdmitidoResponse(
         String trackingNumber,
         String eventId,
-        String destinatario,
-        String ciudadDestino,
-        Instant solicitadoEn,
-        String estadoProcesamiento) {
+        String recipient,
+        String destinationCity,
+        Instant requestedAt,
+        String processingStatus) {
 
     public static EnvioAdmitidoResponse from(EnvioSolicitado solicitud) {
         return new EnvioAdmitidoResponse(
@@ -18,6 +18,6 @@ public record EnvioAdmitidoResponse(
                 solicitud.destinatario().getFullName(),
                 solicitud.ciudadDestino().etiqueta(),
                 solicitud.solicitadoEn(),
-                "ENCOLADO");
+                "QUEUED");
     }
 }
