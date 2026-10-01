@@ -9,6 +9,11 @@ import java.time.Instant;
  * Distingue tres momentos, y confundirlos es lo que hacía retroceder el estado del
  * envío: {@code movedAt} es cuándo ocurrió el movimiento, {@code registeredAt} cuándo
  * se recibió el reporte y {@code occurredAt} cuándo se publicó este evento.
+ *
+ * {@code centerId} y {@code cityName} identifican el centro del catálogo donde ocurrió
+ * el movimiento, para que quien agrupe por punto de la red no dependa del nombre
+ * (que puede repetirse o cambiar). Son null en los eventos históricos registrados con
+ * texto libre, antes de que existiera el catálogo de centros.
  */
 public record EventoLogisticoRegistradoEvent(
         Long logisticsEventId,
@@ -16,6 +21,8 @@ public record EventoLogisticoRegistradoEvent(
         String eventType,
         String resultingStatus,
         String point,
+        Long centerId,
+        String cityName,
         Instant movedAt,
         Instant registeredAt,
         Instant occurredAt) implements DomainEvent {

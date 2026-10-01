@@ -63,6 +63,8 @@ public class RegistrarEventoLogistico {
                 saved.getType().name(),
                 saved.getType().resultingStatus(),
                 saved.getPoint(),
+                saved.getCenterId(),
+                saved.getCityName(),
                 saved.getOccurredAt(),
                 saved.getRegisteredAt(),
                 now));
