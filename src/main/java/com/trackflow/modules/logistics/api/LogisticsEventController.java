@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -37,8 +38,14 @@ public class LogisticsEventController {
         this.consultarAccionesDisponibles = consultarAccionesDisponibles;
     }
 
+    /**
+     * Admite un movimiento. Con la cabecera {@code Idempotency-Key}, reintentar la misma
+     * petición (por ejemplo, tras un timeout) devuelve el mismo movimiento en vez de
+     * registrarlo dos veces.
+     */
     @PostMapping("/events")
     public ResponseEntity<EventoAdmitidoResponse> admitir(@PathVariable String trackingNumber,
+            @RequestHeader(value = "Idempotency-Key", required = false) String claveIdempotencia,
             @Valid @RequestBody RegistrarEventoRequest request) {
         EventoLogisticoEntrante evento = admitirEventoLogistico.ejecutar(new AdmitirEventoLogistico.Command(
                 trackingNumber,
@@ -46,7 +53,8 @@ public class LogisticsEventController {
                 request.centerId(),
                 request.notes(),
                 request.delivererName(),
-                request.occurredAt()));
+                request.occurredAt(),
+                claveIdempotencia));
 
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(EventoAdmitidoResponse.from(evento));
     }

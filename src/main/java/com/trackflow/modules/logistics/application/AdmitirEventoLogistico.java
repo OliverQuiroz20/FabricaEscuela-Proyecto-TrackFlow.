@@ -3,6 +3,8 @@ package com.trackflow.modules.logistics.application;
 import com.trackflow.modules.logistics.domain.Centro;
 import com.trackflow.modules.logistics.domain.CentroFueraDeCiudadException;
 import com.trackflow.modules.logistics.domain.CiudadEsperada;
+import com.trackflow.modules.logistics.domain.ClaveDeIdempotenciaEnUsoException;
+import com.trackflow.modules.logistics.domain.ClaveDeIdempotenciaInvalidaException;
 import com.trackflow.modules.logistics.domain.EventType;
 import com.trackflow.modules.logistics.domain.FechaDeMovimientoInvalidaException;
 import com.trackflow.modules.logistics.domain.FlujoLogistico;
@@ -16,6 +18,7 @@ import com.trackflow.shared.geografia.Ciudad;
 import java.time.Clock;
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import org.springframework.stereotype.Service;
 
@@ -34,11 +37,16 @@ public class AdmitirEventoLogistico {
      * {@code centroId} identifica el centro del catálogo donde ocurrió el movimiento;
      * de él salen el nombre del punto y la ciudad, y contra él se validan las reglas
      * del recorrido. {@code ocurridoEn} es opcional: si el punto de la cadena no lo
-     * reporta, se asume que el movimiento acaba de ocurrir.
+     * reporta, se asume que el movimiento acaba de ocurrir. {@code claveIdempotencia}
+     * también es opcional: si el cliente la envía, un reintento con la misma clave no
+     * registra el movimiento dos veces.
      */
     public record Command(String trackingNumber, EventType tipo, Long centroId, String observaciones,
-            String repartidorNombre, Instant ocurridoEn) {
+            String repartidorNombre, Instant ocurridoEn, String claveIdempotencia) {
     }
+
+    /** El eventId es una columna de texto; una clave más larga no tiene uso legítimo. */
+    static final int LARGO_MAXIMO_CLAVE = 100;
 
     private final TrackedShipmentRepository trackedShipments;
     private final LogisticsEventRepository logisticsEvents;
@@ -65,6 +73,18 @@ public class AdmitirEventoLogistico {
         TrackedShipment envio = trackedShipments.porTrackingNumber(command.trackingNumber())
                 .orElseThrow(() -> new UnknownShipmentException(command.trackingNumber()));
 
+        // Un reintento (por ejemplo, tras un timeout) con una clave que ya se registró
+        // recibe el mismo movimiento en vez de crear otro. Se resuelve antes de validar
+        // el recorrido: el envío ya avanzó con ese movimiento y validarlo de nuevo lo
+        // rechazaría como transición inválida.
+        String clave = normalizar(command.claveIdempotencia());
+        if (clave != null) {
+            Optional<LogisticsEvent> yaRegistrado = logisticsEvents.porEventId(clave);
+            if (yaRegistrado.isPresent()) {
+                return comoEntrante(yaRegistrado.get(), command.trackingNumber());
+            }
+        }
+
         Instant ahora = clock.instant();
         Instant ocurridoEn = command.ocurridoEn() == null ? ahora : command.ocurridoEn();
 
@@ -82,7 +102,7 @@ public class AdmitirEventoLogistico {
         validarCiudadDelCentro(command.tipo(), estado, centro, ciudadCentro);
 
         EventoLogisticoEntrante evento = new EventoLogisticoEntrante(
-                UUID.randomUUID().toString(),
+                clave != null ? clave : UUID.randomUUID().toString(),
                 command.trackingNumber(),
                 command.tipo(),
                 centro.getId(),
@@ -95,6 +115,33 @@ public class AdmitirEventoLogistico {
         publisher.publicar(evento);
 
         return evento;
+    }
+
+    private static String normalizar(String clave) {
+        if (clave == null || clave.isBlank()) {
+            return null;
+        }
+        String recortada = clave.trim();
+        if (recortada.length() > LARGO_MAXIMO_CLAVE) {
+            throw new ClaveDeIdempotenciaInvalidaException(LARGO_MAXIMO_CLAVE);
+        }
+        return recortada;
+    }
+
+    private static EventoLogisticoEntrante comoEntrante(LogisticsEvent evento, String trackingNumber) {
+        if (!evento.getTrackingNumber().equals(trackingNumber)) {
+            throw new ClaveDeIdempotenciaEnUsoException(evento.getEventId(), trackingNumber);
+        }
+        return new EventoLogisticoEntrante(
+                evento.getEventId(),
+                evento.getTrackingNumber(),
+                evento.getType(),
+                evento.getCenterId(),
+                evento.getPoint(),
+                evento.getCityName(),
+                evento.getNotes(),
+                evento.getDelivererName(),
+                evento.getOccurredAt());
     }
 
     /** El movimiento debe caber en el recorrido: en el orden correcto y sin retroceder en el tiempo. */

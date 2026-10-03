@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -91,15 +92,25 @@ public class DataSeeder implements ApplicationRunner {
     private final CatalogoDeCiudades ciudades;
     private final CatalogoDeCentros centros;
     private final Clock clock;
+    private final Duration esperaMaxima;
 
+    @Autowired
     public DataSeeder(EnvioSolicitadoPublisher envios, EventoLogisticoPublisher eventos, ShipmentRepository shipments,
             CatalogoDeCiudades ciudades, CatalogoDeCentros centros, Clock clock) {
+        this(envios, eventos, shipments, ciudades, centros, clock, ESPERA_MAXIMA);
+    }
+
+    /** Permite a las pruebas acortar la espera sin tener que aguardar 30 s por envío. */
+    DataSeeder(EnvioSolicitadoPublisher envios, EventoLogisticoPublisher eventos, ShipmentRepository shipments,
+            CatalogoDeCiudades ciudades, CatalogoDeCentros centros, Clock clock,
+            Duration esperaMaxima) {
         this.envios = envios;
         this.eventos = eventos;
         this.shipments = shipments;
         this.ciudades = ciudades;
         this.centros = centros;
         this.clock = clock;
+        this.esperaMaxima = esperaMaxima;
     }
 
     @Override
@@ -365,7 +376,7 @@ public class DataSeeder implements ApplicationRunner {
     }
 
     private void esperarA(String trackingNumber) throws InterruptedException {
-        long limite = System.currentTimeMillis() + ESPERA_MAXIMA.toMillis();
+        long limite = System.currentTimeMillis() + esperaMaxima.toMillis();
         while (!existe(trackingNumber)) {
             if (System.currentTimeMillis() > limite) {
                 log.warn("El envío semilla {} no se registró a tiempo; sus eventos podrían rechazarse",

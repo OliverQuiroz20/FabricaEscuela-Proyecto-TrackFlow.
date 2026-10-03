@@ -41,12 +41,17 @@ public class RegistrarEnvio {
         }
 
         Instant now = clock.instant();
+        // El envío existe desde que se admitió, no desde que se consumió la cola: si el
+        // consumo se atrasa o se reprocesa, la fecha de registro no debe moverse, ni
+        // quedar posterior a los movimientos que ya tiene. Los mensajes sin la fecha
+        // (anteriores a que viajara en el mensaje) caen en la hora de consumo.
+        Instant registradoEn = solicitud.solicitadoEn() != null ? solicitud.solicitadoEn() : now;
         Shipment saved = shipments.save(Shipment.registrar(
                 trackingNumber,
                 solicitud.remitente(),
                 solicitud.destinatario(),
                 solicitud.descripcion(),
-                now));
+                registradoEn));
 
         events.publish(new EnvioCreadoEvent(
                 saved.getTrackingNumber().value(),
