@@ -77,6 +77,14 @@ public class DataSeeder implements ApplicationRunner {
             int horasDesdeRegistro, List<Movimiento> movimientos) {
     }
 
+    /** Remitente y destinatario de los tres envíos del plan de calidad (sección 6.5). */
+    private static final Persona REMITENTE_CALIDAD = new Persona("Ana Remitente", TipoDocumento.CC, "1017254893",
+            "3001112233", "Calle 10 #20-30", MEDELLIN);
+    private static final Persona DESTINATARIO_CALIDAD = new Persona("Beto Destinatario", TipoDocumento.CC,
+            "79546218", "3004445566", "Carrera 7 #40-50", BOGOTA);
+
+    private static final String RECIBIDO_POR_DESTINATARIO = "Recibido por el destinatario";
+
     private final EnvioSolicitadoPublisher envios;
     private final EventoLogisticoPublisher eventos;
     private final ShipmentRepository shipments;
@@ -141,24 +149,18 @@ public class DataSeeder implements ApplicationRunner {
                 // --- Los tres del plan de calidad (sección 6.5). No cambiar: los casos
                 // CP-01 a CP-10 dependen de estos números, estados y personas.
                 new Semilla(SIN_MOVIMIENTOS,
-                        new Persona("Ana Remitente", TipoDocumento.CC, "1017254893", "3001112233",
-                                "Calle 10 #20-30", MEDELLIN),
-                        new Persona("Beto Destinatario", TipoDocumento.CC, "79546218", "3004445566",
-                                "Carrera 7 #40-50", BOGOTA),
+                        REMITENTE_CALIDAD,
+                        DESTINATARIO_CALIDAD,
                         "Documentos legales", 2, List.of()),
                 new Semilla(EN_TRANSITO,
-                        new Persona("Ana Remitente", TipoDocumento.CC, "1017254893", "3001112233",
-                                "Calle 10 #20-30", MEDELLIN),
-                        new Persona("Beto Destinatario", TipoDocumento.CC, "79546218", "3004445566",
-                                "Carrera 7 #40-50", BOGOTA),
+                        REMITENTE_CALIDAD,
+                        DESTINATARIO_CALIDAD,
                         "Repuestos industriales", 10, List.of(
                                 new Movimiento(EventType.RECEIVED_AT_CENTER, CENTRO_MEDELLIN, 9, null, null),
                                 new Movimiento(EventType.DISPATCHED, CENTRO_MEDELLIN, 8, null, null))),
                 new Semilla(ENTREGADO,
-                        new Persona("Ana Remitente", TipoDocumento.CC, "1017254893", "3001112233",
-                                "Calle 10 #20-30", MEDELLIN),
-                        new Persona("Beto Destinatario", TipoDocumento.CC, "79546218", "3004445566",
-                                "Carrera 7 #40-50", BOGOTA),
+                        REMITENTE_CALIDAD,
+                        DESTINATARIO_CALIDAD,
                         "Equipo médico", 36, List.of(
                                 new Movimiento(EventType.RECEIVED_AT_CENTER, CENTRO_MEDELLIN, 35, null, null),
                                 new Movimiento(EventType.DISPATCHED, CENTRO_MEDELLIN, 33, null, null),
@@ -181,7 +183,7 @@ public class DataSeeder implements ApplicationRunner {
                                 new Movimiento(EventType.OUT_FOR_DELIVERY, CENTRO_MEDELLIN, 30,
                                         "Jhon Fredy Ospina", null),
                                 new Movimiento(EventType.DELIVERED, CENTRO_MEDELLIN, 27, null,
-                                        "Recibido por el destinatario"))),
+                                        RECIBIDO_POR_DESTINATARIO))),
                 new Semilla("TF000000000005",
                         new Persona("Confecciones La Montaña S.A.S.", TipoDocumento.NIT, "901245873-3", "6044127730",
                                 "Carrera 52 #29-47, Bodega 3, Guayabal", MEDELLIN),
@@ -254,7 +256,7 @@ public class DataSeeder implements ApplicationRunner {
                                 new Movimiento(EventType.OUT_FOR_DELIVERY, CENTRO_BOGOTA, 80,
                                         "Edwin Mauricio Suárez", null),
                                 new Movimiento(EventType.DELIVERED, CENTRO_BOGOTA, 76, null,
-                                        "Recibido por el destinatario"))),
+                                        RECIBIDO_POR_DESTINATARIO))),
                 new Semilla("TF000000000012",
                         new Persona("Jorge Luis Fontalvo Barraza", TipoDocumento.CC, "8745123", "3013398874",
                                 "Calle 45 #21-30, Boston", BARRANQUILLA),
@@ -293,7 +295,7 @@ public class DataSeeder implements ApplicationRunner {
                                 new Movimiento(EventType.OUT_FOR_DELIVERY, CENTRO_BARRANQUILLA, 30,
                                         "Andrés Mauricio Polo", null),
                                 new Movimiento(EventType.DELIVERED, CENTRO_BARRANQUILLA, 28, null,
-                                        "Recibido por el destinatario"))));
+                                        RECIBIDO_POR_DESTINATARIO))));
     }
 
     /**
