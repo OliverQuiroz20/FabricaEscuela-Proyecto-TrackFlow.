@@ -3,6 +3,8 @@ package com.trackflow.modules.logistics.api;
 import com.trackflow.modules.logistics.domain.CentroFueraDeCiudadException;
 import com.trackflow.modules.logistics.domain.CentroInvalidoException;
 import com.trackflow.modules.logistics.domain.CentroNoEncontradoException;
+import com.trackflow.modules.logistics.domain.ClaveDeIdempotenciaEnUsoException;
+import com.trackflow.modules.logistics.domain.ClaveDeIdempotenciaInvalidaException;
 import com.trackflow.modules.logistics.domain.MovimientoFueraDeOrdenException;
 import com.trackflow.modules.logistics.domain.FechaDeMovimientoInvalidaException;
 import com.trackflow.modules.logistics.domain.TransicionInvalidaException;
@@ -47,6 +49,20 @@ public class LogisticsExceptionHandler {
     ProblemDetail centroFueraDeCiudad(CentroFueraDeCiudadException e) {
         ProblemDetail problema = ProblemDetail.forStatusAndDetail(HttpStatus.UNPROCESSABLE_ENTITY, e.getMessage());
         problema.setTitle("El centro no está en la ciudad esperada");
+        return problema;
+    }
+
+    @ExceptionHandler(ClaveDeIdempotenciaInvalidaException.class)
+    ProblemDetail claveInvalida(ClaveDeIdempotenciaInvalidaException e) {
+        ProblemDetail problema = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, e.getMessage());
+        problema.setTitle("Clave de idempotencia inválida");
+        return problema;
+    }
+
+    @ExceptionHandler(ClaveDeIdempotenciaEnUsoException.class)
+    ProblemDetail claveEnUso(ClaveDeIdempotenciaEnUsoException e) {
+        ProblemDetail problema = ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, e.getMessage());
+        problema.setTitle("Clave de idempotencia ya usada en otro envío");
         return problema;
     }
 

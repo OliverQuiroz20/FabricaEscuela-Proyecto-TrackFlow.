@@ -3,6 +3,7 @@ package com.trackflow.modules.logistics.infrastructure;
 import com.trackflow.modules.logistics.application.LogisticsEventRepository;
 import com.trackflow.modules.logistics.domain.LogisticsEvent;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -32,5 +33,10 @@ public class JpaLogisticsEventRepository implements LogisticsEventRepository {
     @Override
     public boolean existePorEventId(String eventId) {
         return jpa.existsByEventId(eventId);
+    }
+
+    @Override
+    public Optional<LogisticsEvent> porEventId(String eventId) {
+        return jpa.findByEventId(eventId);
     }
 }

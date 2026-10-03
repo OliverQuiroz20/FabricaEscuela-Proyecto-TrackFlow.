@@ -2,6 +2,7 @@ package com.trackflow.modules.logistics.application;
 
 import com.trackflow.modules.logistics.domain.LogisticsEvent;
 import java.util.List;
+import java.util.Optional;
 
 public interface LogisticsEventRepository {
 
@@ -12,4 +13,6 @@ public interface LogisticsEventRepository {
     List<LogisticsEvent> findTodosCronologicamente();
 
     boolean existePorEventId(String eventId);
+
+    Optional<LogisticsEvent> porEventId(String eventId);
 }
