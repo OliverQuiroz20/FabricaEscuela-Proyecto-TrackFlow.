@@ -6,6 +6,8 @@ import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.core.DelegatingOAuth2TokenValidator;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtValidators;
@@ -30,20 +32,27 @@ public class JwtConfig {
                 propiedades.secretoEfectivo().getBytes(StandardCharsets.UTF_8), "HmacSHA256");
     }
 
+    /** BCrypt guarda la sal dentro del hash: no hace falta una columna aparte para ella. */
+    @Bean
+    PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
     @Bean
     JwtEncoder jwtEncoder() {
         return new NimbusJwtEncoder(new ImmutableSecret<>(clave));
     }
 
     /**
-     * A las validaciones por defecto (vencimiento) se suma la de sesión cerrada (HU-08):
-     * sin ella, un token seguiría sirviendo después del logout hasta que venciera.
+     * A las validaciones por defecto (firma y vencimiento) se suma la de sesión activa
+     * (HU-08): sin ella, un token seguiría sirviendo después del logout, de la
+     * inactividad o de desactivar al usuario, hasta que venciera.
      */
     @Bean
-    JwtDecoder jwtDecoder(TokenRevocadoRepository revocados) {
+    JwtDecoder jwtDecoder(Sesiones sesiones) {
         NimbusJwtDecoder decoder = NimbusJwtDecoder.withSecretKey(clave).build();
         decoder.setJwtValidator(new DelegatingOAuth2TokenValidator<>(
-                JwtValidators.createDefault(), new TokenNoRevocadoValidator(revocados)));
+                JwtValidators.createDefault(), new SesionActivaValidator(sesiones)));
         return decoder;
     }
 }
