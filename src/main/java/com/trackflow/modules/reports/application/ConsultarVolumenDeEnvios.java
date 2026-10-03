@@ -70,7 +70,7 @@ public class ConsultarVolumenDeEnvios {
     private static void validar(LocalDate primerDia, LocalDate ultimoDia, LocalDate hoy) {
         if (ultimoDia.isBefore(primerDia)) {
             throw new PeriodoInvalidoException(
-                    "El periodo está invertido: 'hasta' (%s) es anterior a 'desde' (%s)".formatted(ultimoDia, primerDia));
+                    "El periodo está invertido: 'to' (%s) es anterior a 'from' (%s)".formatted(ultimoDia, primerDia));
         }
         if (primerDia.isAfter(hoy)) {
             throw new PeriodoInvalidoException(
