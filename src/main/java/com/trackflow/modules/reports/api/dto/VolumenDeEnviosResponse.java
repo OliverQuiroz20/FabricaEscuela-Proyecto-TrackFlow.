@@ -7,31 +7,31 @@ import java.time.LocalDate;
 import java.util.List;
 
 public record VolumenDeEnviosResponse(
-        LocalDate desde,
-        LocalDate hasta,
+        LocalDate from,
+        LocalDate to,
 
         /** Instante hasta el que se contó. Si el periodo incluye hoy, es el momento de la consulta. */
-        Instant corte,
+        Instant cutoff,
 
         /** true si el periodo incluye el día en curso y la cifra aún puede crecer. */
-        boolean enCurso,
+        boolean inProgress,
 
         /** Envíos registrados en el periodo. */
-        long totalEnvios,
+        long totalShipments,
 
         /** Envíos entregados en el periodo (cifra aparte: pueden haberse registrado antes). */
-        long totalEntregados,
+        long totalDelivered,
 
-        /** Desglose de totalEnvios por punto de ingreso a la red; suma totalEnvios. */
-        List<PuntoResponse> porPunto,
+        /** Desglose de totalShipments por punto de ingreso a la red; suma totalShipments. */
+        List<PuntoResponse> byPoint,
 
         /** Solo viene informado cuando no hubo envíos en el periodo; si no, es null. */
-        String mensaje) {
+        String message) {
 
     static final String SIN_ENVIOS = "No hay envíos registrados en el periodo consultado";
 
-    public record PuntoResponse(Long centroId, String punto, String ciudad, boolean pendienteDeRecepcion,
-            long envios) {
+    public record PuntoResponse(Long centerId, String point, String city, boolean pendingReception,
+            long shipments) {
 
         static PuntoResponse from(VolumenPorPunto punto) {
             return new PuntoResponse(punto.centroId(), punto.punto(), punto.ciudad(), punto.pendienteDeRecepcion(),

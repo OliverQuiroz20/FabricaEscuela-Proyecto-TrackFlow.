@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
  * dimensiona la operación.
  */
 @RestController
-@RequestMapping("/api/reportes")
+@RequestMapping("/api/reports")
 public class ReporteVolumenController {
 
     private final ConsultarVolumenDeEnvios consultarVolumen;
@@ -30,12 +30,14 @@ public class ReporteVolumenController {
     /**
      * @param desde primer día del periodo (AAAA-MM-DD, hora de Colombia); por defecto, hoy
      * @param hasta último día del periodo, inclusive; por defecto, el mismo día que desde
+     *
+     * La ruta y los parámetros van en inglés como el resto del contrato (bug #89).
      */
-    @GetMapping("/volumen-envios")
+    @GetMapping("/shipment-volume")
     public VolumenDeEnviosResponse volumen(
-            @RequestParam(value = "desde", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+            @RequestParam(value = "from", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
             LocalDate desde,
-            @RequestParam(value = "hasta", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+            @RequestParam(value = "to", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
             LocalDate hasta) {
         return VolumenDeEnviosResponse.from(consultarVolumen.ejecutar(desde, hasta));
     }
