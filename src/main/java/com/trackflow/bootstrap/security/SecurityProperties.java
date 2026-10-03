@@ -1,7 +1,5 @@
 package com.trackflow.bootstrap.security;
 
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
 import java.security.SecureRandom;
 import java.time.Duration;
 import java.util.Base64;
@@ -34,6 +32,7 @@ public class SecurityProperties {
     private final String adminUsuario;
     private final String adminClave;
     private final Duration duracionToken;
+    private final Duration inactividad;
 
     public SecurityProperties(
             @Value("${trackflow.security.jwt-secret:}") String secreto,
@@ -41,31 +40,36 @@ public class SecurityProperties {
             @Value("${trackflow.security.operador-clave:}") String operadorClave,
             @Value("${trackflow.security.admin-usuario:admin}") String adminUsuario,
             @Value("${trackflow.security.admin-clave:}") String adminClave,
-            @Value("${trackflow.security.duracion-token-minutos:60}") long duracionMinutos) {
+            @Value("${trackflow.security.duracion-token-minutos:480}") long duracionMinutos,
+            @Value("${trackflow.security.inactividad-minutos:30}") long inactividadMinutos) {
         this.secreto = secreto;
         this.operadorUsuario = operadorUsuario;
         this.operadorClave = operadorClave;
         this.adminUsuario = adminUsuario;
         this.adminClave = adminClave;
         this.duracionToken = Duration.ofMinutes(duracionMinutos);
+        this.inactividad = Duration.ofMinutes(inactividadMinutos);
     }
 
     public boolean proteccionActiva() {
         return !esVacia(operadorClave) || !esVacia(adminClave);
     }
 
-    /**
-     * Roles que corresponden a unas credenciales, o {@code null} si no son válidas.
-     * El administrador también es operador: hereda sus permisos.
-     */
-    public String rolesDe(String usuario, String clave) {
-        if (!esVacia(adminClave) && coincide(adminUsuario, usuario) && coincide(adminClave, clave)) {
-            return ROL_ADMIN + " " + ROL_OPERADOR;
-        }
-        if (!esVacia(operadorClave) && coincide(operadorUsuario, usuario) && coincide(operadorClave, clave)) {
-            return ROL_OPERADOR;
-        }
-        return null;
+    public String operadorUsuario() {
+        return operadorUsuario;
+    }
+
+    /** Solo para crear el usuario al arrancar: el login compara contra el hash guardado. */
+    public String operadorClave() {
+        return operadorClave;
+    }
+
+    public String adminUsuario() {
+        return adminUsuario;
+    }
+
+    public String adminClave() {
+        return adminClave;
     }
 
     /**
@@ -92,21 +96,17 @@ public class SecurityProperties {
         return !esVacia(adminClave);
     }
 
+    /** Vigencia máxima del token, aunque la sesión siga en uso. */
     public Duration duracionToken() {
         return duracionToken;
     }
 
-    private static boolean esVacia(String valor) {
-        return valor == null || valor.isBlank();
+    /** Tiempo sin actividad tras el que la sesión se cierra (HU-08). */
+    public Duration inactividad() {
+        return inactividad;
     }
 
-    /** Comparación de tiempo constante, para no filtrar información por lo que tarda. */
-    private static boolean coincide(String esperado, String recibido) {
-        if (recibido == null) {
-            return false;
-        }
-        return MessageDigest.isEqual(
-                esperado.getBytes(StandardCharsets.UTF_8),
-                recibido.getBytes(StandardCharsets.UTF_8));
+    private static boolean esVacia(String valor) {
+        return valor == null || valor.isBlank();
     }
 }
