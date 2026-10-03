@@ -9,9 +9,9 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.hu_02</groupId>
-	<artifactId>md_eventos</artifactId>
+	<artifactId>trackflow</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>md_eventos</name>
+	<name>trackflow</name>
 	<description/>
 	<url/>
 	<licenses>
