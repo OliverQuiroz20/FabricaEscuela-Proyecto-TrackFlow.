@@ -14,14 +14,14 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class Sesiones {
 
-    private final SesionRepository sesiones;
+    private final SesionRepository repositorio;
     private final UsuarioRepository usuarios;
     private final SecurityProperties propiedades;
     private final Clock clock;
 
-    public Sesiones(SesionRepository sesiones, UsuarioRepository usuarios, SecurityProperties propiedades,
+    public Sesiones(SesionRepository repositorio, UsuarioRepository usuarios, SecurityProperties propiedades,
             Clock clock) {
-        this.sesiones = sesiones;
+        this.repositorio = repositorio;
         this.usuarios = usuarios;
         this.propiedades = propiedades;
         this.clock = clock;
@@ -29,13 +29,13 @@ public class Sesiones {
 
     @Transactional
     public void abrir(String jti, String username, Instant ahora, Instant expira) {
-        sesiones.borrarVencidas(ahora);
-        sesiones.save(new Sesion(jti, username, ahora, expira));
+        repositorio.borrarVencidas(ahora);
+        repositorio.save(new Sesion(jti, username, ahora, expira));
     }
 
     @Transactional
     public void cerrar(String jti) {
-        sesiones.findById(jti).ifPresent(sesion -> sesion.cerrar(clock.instant()));
+        repositorio.findById(jti).ifPresent(sesion -> sesion.cerrar(clock.instant()));
     }
 
     /**
@@ -49,7 +49,7 @@ public class Sesiones {
             return false;
         }
 
-        Optional<Sesion> encontrada = sesiones.findById(jti);
+        Optional<Sesion> encontrada = repositorio.findById(jti);
         if (encontrada.isEmpty() || !encontrada.get().abierta()) {
             return false;
         }
