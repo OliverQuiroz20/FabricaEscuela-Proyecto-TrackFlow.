@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
  * lugar de teclearlo. Mismo espíritu que CatalogoCiudadesController para ciudades.
  */
 @RestController
-@RequestMapping("/api/centros")
+@RequestMapping("/api/centers")
 public class CentrosController {
 
     private static final int LIMITE = 20;
@@ -35,7 +35,7 @@ public class CentrosController {
     @GetMapping
     public List<CentroResponse> buscar(
             @RequestParam(value = "q", required = false) String q,
-            @RequestParam(value = "ciudadId", required = false) Long ciudadId) {
+            @RequestParam(value = "cityId", required = false) Long ciudadId) {
         return centros.buscar(q, ciudadId, LIMITE).stream()
                 .map(this::aRespuesta)
                 .toList();

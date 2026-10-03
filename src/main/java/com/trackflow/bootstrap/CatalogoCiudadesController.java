@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
  * catálogo es dato de referencia transversal y ningún módulo de negocio es su dueño.
  */
 @RestController
-@RequestMapping("/api/ciudades")
+@RequestMapping("/api/cities")
 public class CatalogoCiudadesController {
 
     private static final int LIMITE = 10;
@@ -29,7 +29,7 @@ public class CatalogoCiudadesController {
         this.ciudades = ciudades;
     }
 
-    public record CiudadResponse(Long id, String nombre, String departamento, String etiqueta) {
+    public record CiudadResponse(Long id, String name, String department, String label) {
 
         static CiudadResponse from(Ciudad ciudad) {
             return new CiudadResponse(ciudad.id(), ciudad.nombre(), ciudad.departamento(), ciudad.etiqueta());

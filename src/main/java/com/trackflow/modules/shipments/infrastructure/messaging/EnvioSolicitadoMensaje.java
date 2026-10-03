@@ -12,20 +12,20 @@ import java.time.Instant;
 public record EnvioSolicitadoMensaje(
         String eventId,
         String trackingNumber,
-        PersonaMensaje remitente,
-        PersonaMensaje destinatario,
-        CiudadMensaje ciudadOrigen,
-        CiudadMensaje ciudadDestino,
-        String descripcion,
-        Instant solicitadoEn) {
+        PersonaMensaje sender,
+        PersonaMensaje recipient,
+        CiudadMensaje originCity,
+        CiudadMensaje destinationCity,
+        String description,
+        Instant requestedAt) {
 
     public record PersonaMensaje(
-            String nombreCompleto,
-            String tipoDocumento,
-            String numeroDocumento,
-            String telefono,
-            String direccion,
-            Long ciudadId) {
+            String fullName,
+            String documentType,
+            String documentNumber,
+            String phone,
+            String address,
+            Long cityId) {
 
         static PersonaMensaje from(Party party) {
             return new PersonaMensaje(
@@ -38,19 +38,19 @@ public record EnvioSolicitadoMensaje(
         }
 
         Party toDomain() {
-            return new Party(nombreCompleto, TipoDocumento.valueOf(tipoDocumento), numeroDocumento,
-                    telefono, direccion, ciudadId);
+            return new Party(fullName, TipoDocumento.valueOf(documentType), documentNumber,
+                    phone, address, cityId);
         }
     }
 
-    public record CiudadMensaje(Long id, String nombre, String departamento) {
+    public record CiudadMensaje(Long id, String name, String department) {
 
         static CiudadMensaje from(Ciudad ciudad) {
             return new CiudadMensaje(ciudad.id(), ciudad.nombre(), ciudad.departamento());
         }
 
         Ciudad toDomain() {
-            return new Ciudad(id, nombre, departamento);
+            return new Ciudad(id, name, department);
         }
     }
 
@@ -70,11 +70,11 @@ public record EnvioSolicitadoMensaje(
         return new EnvioSolicitado(
                 eventId,
                 trackingNumber,
-                remitente.toDomain(),
-                destinatario.toDomain(),
-                ciudadOrigen.toDomain(),
-                ciudadDestino.toDomain(),
-                descripcion,
-                solicitadoEn);
+                sender.toDomain(),
+                recipient.toDomain(),
+                originCity.toDomain(),
+                destinationCity.toDomain(),
+                description,
+                requestedAt);
     }
 }

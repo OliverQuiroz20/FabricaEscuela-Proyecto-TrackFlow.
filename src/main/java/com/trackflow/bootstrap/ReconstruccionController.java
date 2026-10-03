@@ -30,13 +30,13 @@ public class ReconstruccionController {
      * El orden importa: primero los envíos, para que existan antes de reaplicarles
      * sus movimientos; después los eventos, en el orden en que ocurrieron.
      */
-    @PostMapping("/reconstruir-proyecciones")
+    @PostMapping("/rebuild-projections")
     public Map<String, Integer> reconstruir() {
         int enviosRepublicados = envios.ejecutar();
         int eventosRepublicados = eventos.ejecutar();
 
         return Map.of(
-                "enviosRepublicados", enviosRepublicados,
-                "eventosRepublicados", eventosRepublicados);
+                "shipmentsRepublished", enviosRepublicados,
+                "eventsRepublished", eventosRepublicados);
     }
 }

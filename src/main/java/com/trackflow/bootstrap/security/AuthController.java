@@ -38,11 +38,11 @@ public class AuthController {
     static final String CREDENCIALES_INVALIDAS = "Usuario o clave incorrectos";
 
     public record LoginRequest(
-            @NotBlank(message = "el usuario es obligatorio") String usuario,
-            @NotBlank(message = "la clave es obligatoria") String clave) {
+            @NotBlank(message = "el usuario es obligatorio") String username,
+            @NotBlank(message = "la clave es obligatoria") String password) {
     }
 
-    public record TokenResponse(String token, String tipo, String roles, long expiraEnSegundos) {
+    public record TokenResponse(String token, String type, String roles, long expiresInSeconds) {
     }
 
     public record SesionResponse(String username, String roles, Instant expiresAt) {
@@ -81,10 +81,10 @@ public class AuthController {
                     "No hay credenciales configuradas en este entorno");
         }
 
-        Optional<Usuario> encontrado = usuarios.findById(request.usuario());
+        Optional<Usuario> encontrado = usuarios.findById(request.username());
         // Se compara siempre, exista o no el usuario y esté o no activo, para que los
         // tres casos de rechazo tarden lo mismo.
-        boolean claveCorrecta = encoder.matches(request.clave(),
+        boolean claveCorrecta = encoder.matches(request.password(),
                 encontrado.map(Usuario::getPasswordHash).orElse(hashFicticio));
 
         if (encontrado.isEmpty() || !claveCorrecta || !encontrado.get().isActive()) {

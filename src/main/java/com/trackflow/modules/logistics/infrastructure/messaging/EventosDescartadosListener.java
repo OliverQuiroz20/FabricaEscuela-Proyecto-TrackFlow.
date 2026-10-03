@@ -16,7 +16,7 @@ public class EventosDescartadosListener {
 
     @RabbitListener(queues = RabbitMQConfig.DEAD_LETTER_QUEUE)
     public void recibir(EventoLogisticoMensaje mensaje) {
-        log.error("Evento logístico descartado: eventId={} trackingNumber={} tipo={} punto={} ocurridoEn={}",
-                mensaje.eventId(), mensaje.trackingNumber(), mensaje.tipo(), mensaje.punto(), mensaje.ocurridoEn());
+        log.error("Evento logístico descartado: eventId={} trackingNumber={} type={} point={} occurredAt={}",
+                mensaje.eventId(), mensaje.trackingNumber(), mensaje.type(), mensaje.point(), mensaje.occurredAt());
     }
 }
