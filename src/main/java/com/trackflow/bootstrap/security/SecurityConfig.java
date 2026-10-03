@@ -70,6 +70,11 @@ public class SecurityConfig {
                     if (protegido) {
                         // Las operaciones de mantenimiento no las hace quien registra paquetes.
                         auth.requestMatchers("/api/admin/**").hasRole(SecurityProperties.ROL_ADMIN);
+                        // Los reportes muestran la carga de la operación, no el estado de un
+                        // envío: no hay número de seguimiento que haga de credencial, así que
+                        // no son públicos como /api/tracking. El administrador hereda el rol.
+                        auth.requestMatchers(HttpMethod.GET, "/api/reportes/**")
+                                .hasRole(SecurityProperties.ROL_OPERADOR);
                         auth.requestMatchers(HttpMethod.POST, "/api/**")
                                 .hasRole(SecurityProperties.ROL_OPERADOR);
                         // El estado interno del envío y la red de centros son de la
